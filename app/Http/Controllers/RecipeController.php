@@ -18,20 +18,20 @@ class RecipeController extends Controller
     {
         $tab = $r->query('tab');
         $sortBy = $r->query('sortBy');
-
+        $userId = auth()->user()->id;
         $recipes = null;
+
         if ($tab === 'my') {
             $recipes = \App\Models\Recipe::select(['id', 'user_id', 'final_image', 'title', 'slug', 'created_at', 'published', 'category_id'])
-                ->where('user_id', auth()->user()->id)
+                ->where('user_id', $userId)
                 ->with([
                     'author:id,name,photo',
                     'category:id,name,slug'
                 ])
-                ->withCount('savedByUsers as saves_count')
-                ->paginate(20);
+                ->withCount('savedByUsers as saves_count');
         } else {
             $savedIds = \App\Models\SavedRecipe::select('recipe_id')
-                ->where('user_id', auth()->user()->id)
+                ->where('user_id', $userId)
                 ->get()
                 ->pluck('recipe_id')
                 ->toArray();
@@ -44,13 +44,21 @@ class RecipeController extends Controller
                     'author:id,name,photo',
                     'category:id,name,slug'
                 ])
-                ->withCount('savedByUsers as saves_count')
-                ->paginate(20);
-//                ->get();
+                ->withCount('savedByUsers as saves_count');
+        }
+
+        if ($sortBy === 'name') {
+            $recipes->orderBy('title', 'asc');
+        } else if ($sortBy === 'namedesc') {
+            $recipes->orderBy('title', 'desc');
+        } else if ($sortBy === 'newest') {
+            $recipes->orderBy('created_at', 'desc');
+        } else if ($sortBy === 'oldest') {
+            $recipes->orderBy('created_at', 'asc');
         }
 
         return Inertia::render($tab === 'my' ? 'MyRecipes' : 'SavedRecipes', [
-            'recipes' => $recipes
+            'recipes' => $recipes->paginate(20)
         ]);
     }
 
@@ -84,6 +92,7 @@ class RecipeController extends Controller
 
     public function show(string $id, string $slug)
     {
+        $userId = auth()->user()?->id;
         $recipe = \App\Models\Recipe::with(
             [
                 'author:id,name,username,photo',
@@ -117,13 +126,15 @@ class RecipeController extends Controller
             return abort(404);
         }
 
-        $saved = auth()->user() ? !is_null(\App\Models\SavedRecipe::where('recipe_id', $recipe->id)
-            ->where('user_id', auth()->user()->id)
-            ->get()->first()) : false;
+        $saves = $userId ? \App\Models\SavedRecipe::select('recipe_id')
+            ->where('user_id', $userId)
+            ->pluck('recipe_id')
+            ->toArray() : [];
 
         $more = \App\Models\Recipe::select(['id', 'user_id', 'final_image', 'title', 'slug', 'created_at', 'published', 'category_id'])
             ->whereNot('id', $recipe->id)
             ->where('user_id', $recipe->user_id)
+            ->where('published', true)
             ->with([
                 'author:id,name,photo',
                 'category:id,name,slug'
@@ -131,10 +142,8 @@ class RecipeController extends Controller
             ->withCount('savedByUsers as saves_count')
             ->limit(5)
             ->get()
-            ->map(function ($item) {
-                $item->saved = auth()->user() ? !is_null(\App\Models\SavedRecipe::where('recipe_id', $item->id)
-                    ->where('user_id', auth()->user()->id)
-                    ->get()->first()) : false;
+            ->map(function ($item) use ($userId, $saves) {
+                $item->saved = $userId ? in_array($item->id, $saves) : false;
                 return $item;
             });
 
@@ -143,15 +152,17 @@ class RecipeController extends Controller
 
         $canEdit = $recipe->user_id === auth()->user()?->id;
 
-        return Inertia::render('PostRead', [
+        $response = [
             'recipe' => [
                 ...$recipe->toArray(),
                 'saves_count' => $savesCount,
-                'saved' => $saved
+                'saved' => in_array($recipe->id, $saves)
             ],
             'canEdit' => $canEdit,
-            'more' => $more
-        ]);
+            'more' => $more->toArray(),
+        ];
+
+        return Inertia::render('PostRead', $response);
     }
 
     public function edit(string $id)
@@ -246,6 +257,8 @@ class RecipeController extends Controller
 
         $recipe->final_image = $filename;
         $recipe->save();
+
+        return back();
     }
 
     public function deleteFinalImage(string $id)
@@ -256,6 +269,8 @@ class RecipeController extends Controller
 
         $recipe->final_image = null;
         $recipe->save();
+
+        return back();
     }
 
     // public function uploadStepImage(Request $r, string $id)

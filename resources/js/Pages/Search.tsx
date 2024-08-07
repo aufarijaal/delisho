@@ -5,18 +5,28 @@ import { Dropdown, Skeleton, Pagination, Button, Card } from "react-daisyui";
 import React, { useState } from "react";
 import JsonViewer from "@andypf/json-viewer/dist/esm/react/JsonViewer";
 import RecipeSearchForm from "@/Components/RecipeSearchForm";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 
-const SearchPage = ({ auth, recipes, q }) => {
+const SearchPage = ({ auth, recipes, q, sortBy }) => {
     const [initialLoading, setInitialLoading] = useState(false);
 
     return (
         <DefaultLayout user={auth.user}>
             <div className="max-w-7xl mx-auto px-2 pb-32 pt-10">
-                <h1 className="text-center text-zinc-500">Search result for</h1>
-                <h1 className="text-4xl font-extrabold font-serif text-center mt-2">
-                    {q}
-                </h1>
+                {q ? (
+                    <>
+                        <h1 className="text-center text-zinc-500">
+                            Search result for
+                        </h1>
+                        <h1 className="text-4xl font-extrabold font-serif text-center mt-2">
+                            {q}
+                        </h1>
+                    </>
+                ) : (
+                    <h1 className="text-center font-serif font-extrabold text-4xl">
+                        Search
+                    </h1>
+                )}
 
                 {/* <JsonViewer data={recipes} /> */}
 
@@ -30,10 +40,42 @@ const SearchPage = ({ auth, recipes, q }) => {
                             Filter
                             <Icon icon="mdi:filter-outline" width="20" />
                         </Dropdown.Toggle>
-                        <Dropdown.Menu className="w-52 z-[5] translate-y-2 rounded-md">
-                            <Card.Body>
-                                <div>Hello world</div>
-                            </Card.Body>
+                        <Dropdown.Menu className="w-72 z-[5] translate-y-2 rounded-md p-4">
+                            <div>
+                                <div>
+                                    <h5 className="font-bold">Sort by</h5>
+                                    <div className="mt-2 flex gap-1 [&>button]:flex-1">
+                                        <Button
+                                            size="sm"
+                                            color="accent"
+                                            variant="outline"
+                                            active={
+                                                sortBy === "newest" || !sortBy
+                                            }
+                                            onClick={() => {
+                                                router.get(`/search`, {
+                                                    sortBy: "newest",
+                                                });
+                                            }}
+                                        >
+                                            Newest
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            color="accent"
+                                            active={sortBy === "oldest"}
+                                            onClick={() => {
+                                                router.get(`/search`, {
+                                                    sortBy: "oldest",
+                                                });
+                                            }}
+                                            variant="outline"
+                                        >
+                                            Oldest
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>

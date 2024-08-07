@@ -24,7 +24,7 @@ const CommentItem = ({ auth, data }) => {
                         @{data.user.username}
                     </p>
                 </div>
-                {auth.user.id === data.user.id ? (
+                {auth?.user?.id === data.user.id ? (
                     <Dropdown end>
                         <Button size="sm" color="ghost">
                             <Icon icon="tabler:dots" width="20" />

@@ -1,7 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/DefaultLayout";
-import {Head, router, useForm, usePage} from "@inertiajs/react";
-import {PageProps} from "@/types";
-import {Icon} from "@iconify-icon/react/dist/iconify.mjs";
+import { Head, router, useForm, usePage } from "@inertiajs/react";
+import { PageProps } from "@/types";
+import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import {
     Button,
     Dropdown,
@@ -12,15 +12,15 @@ import {
     Textarea,
 } from "react-daisyui";
 import pickRandom from "@/Utils/pick-random";
-import {useState, useEffect, useRef} from "react";
-import {ReactSortable} from "react-sortablejs";
-import {resolveFinalImageUrl} from "@/Utils/image-url-resolver";
+import { useState, useEffect, useRef } from "react";
+import { ReactSortable } from "react-sortablejs";
+import { resolveFinalImageUrl } from "@/Utils/image-url-resolver";
 
 const IngredientItem: React.FC<{
     value: string;
     onValueChange: (v: string) => void;
     onRemove: () => void;
-}> = ({value, onValueChange, onRemove}) => {
+}> = ({ value, onValueChange, onRemove }) => {
     return (
         <div className="ingredient-item flex items-center w-full gap-2">
             <button
@@ -28,7 +28,7 @@ const IngredientItem: React.FC<{
                 type="button"
                 tabIndex={-1}
             >
-                <Icon icon="mdi:drag" width="24"/>
+                <Icon icon="mdi:drag" width="24" />
             </button>
             <Input
                 id="ingredient-item"
@@ -42,7 +42,7 @@ const IngredientItem: React.FC<{
 
             <Dropdown className="dropdown-end">
                 <Dropdown.Toggle size="sm" color="ghost">
-                    <Icon icon="mdi:dots-horizontal" width="20"/>
+                    <Icon icon="mdi:dots-horizontal" width="20" />
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu className="w-max z-10">
@@ -65,15 +65,15 @@ const StepItem: React.FC<{
     stepId: number;
     wholeSteps: any;
 }> = ({
-          value,
-          stepIndex,
-          onValueChange,
-          onRemove,
-          recipeId,
-          image,
-          stepId,
-          wholeSteps,
-      }) => {
+    value,
+    stepIndex,
+    onValueChange,
+    onRemove,
+    recipeId,
+    image,
+    stepId,
+    wholeSteps,
+}) => {
     // const stepImageRef = useRef(null);
 
     // const handleStepImageUpload = (e: any) => {
@@ -100,11 +100,10 @@ const StepItem: React.FC<{
                 type="button"
                 tabIndex={-1}
             >
-                <Icon icon="mdi:drag" width="24"/>
+                <Icon icon="mdi:drag" width="24" />
             </button>
             <div className="flex-grow relative">
-                <div
-                    className="w-[25px] h-[25px] rounded-full bg-accent text-white grid place-items-center text-sm font-semibold absolute -top-3 -left-3">
+                <div className="w-[25px] h-[25px] rounded-full bg-accent text-white grid place-items-center text-sm font-semibold absolute -top-3 -left-3">
                     {stepIndex}
                 </div>
                 <Textarea
@@ -143,7 +142,7 @@ const StepItem: React.FC<{
 
             <Dropdown className="dropdown-end">
                 <Dropdown.Toggle size="sm" color="ghost">
-                    <Icon icon="mdi:dots-horizontal" width="20"/>
+                    <Icon icon="mdi:dots-horizontal" width="20" />
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu className="w-max z-10">
@@ -157,17 +156,17 @@ const StepItem: React.FC<{
 };
 
 export default function CreateRecipePage({
-                                             auth,
-                                             recipe,
-                                             categories,
-                                             errors,
-                                         }: any) {
+    auth,
+    recipe,
+    categories,
+    errors,
+}: any) {
     const [showButton, setShowButton] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [scrollThreshold, setScrollThreshold] = useState(100);
     const inputFinalImage = useRef(null);
 
-    const {data, setData} = useForm<{
+    const { data, setData } = useForm<{
         title: string;
         description: string;
         portion: string;
@@ -234,7 +233,7 @@ export default function CreateRecipePage({
 
     return (
         <main className="min-h-screen bg-[#f8f6f2] pt-20">
-            <Head title="Create Recipe"/>
+            <Head title="Create Recipe" />
 
             <Navbar className="bg-base-100 backdrop-blur-sm shadow-sm shadow-base-200 fixed top-0 left-0 z-10">
                 <div className="flex-1 flex items-center ml-4">
@@ -248,35 +247,39 @@ export default function CreateRecipePage({
                             }
                         }}
                     >
-                        <Icon icon="mdi:arrow-left" width="20"/>
+                        <Icon icon="mdi:arrow-left" width="20" />
                         Back
                     </button>
                     <Link
                         href="/"
                         className="text-xl normal-case flex items-center font-bold gap-2 px-4"
                     >
-                        <img src="/logo.svg" alt="logo" className="w-8 h-8"/>
+                        <img src="/logo.svg" alt="logo" className="w-8 h-8" />
                         Delisho
                     </Link>
                 </div>
 
                 <div className="flex-none gap-4 items-center pr-4">
                     <span className="text-sm text-zinc-600 flex items-center gap-2 font-bold">
-                        {recipe.published ? <>
-                            <Icon
-                                icon="material-symbols:check-circle"
-                                width="20"
-                                className="text-success"
-                            />
-                            Published
-                        </> : <>
-                            <Icon
-                                icon="material-symbols:unpublished"
-                                width="20"
-                                className="text-error"
-                            />
-                            Not published
-                        </>}
+                        {recipe.published ? (
+                            <>
+                                <Icon
+                                    icon="material-symbols:check-circle"
+                                    width="20"
+                                    className="text-success"
+                                />
+                                Published
+                            </>
+                        ) : (
+                            <>
+                                <Icon
+                                    icon="material-symbols:unpublished"
+                                    width="20"
+                                    className="text-error"
+                                />
+                                Not published
+                            </>
+                        )}
                     </span>
                 </div>
             </Navbar>
@@ -308,7 +311,7 @@ export default function CreateRecipePage({
                                         (inputFinalImage.current as any).click()
                                     }
                                 >
-                                    <Icon icon="mdi:camera" width="32"/>
+                                    <Icon icon="mdi:camera" width="32" />
                                     <span className="text-sm">
                                         Upload your final image here
                                     </span>
@@ -569,7 +572,7 @@ export default function CreateRecipePage({
                                             });
                                         }}
                                     >
-                                        <Icon icon="mdi:plus" width="20"/>
+                                        <Icon icon="mdi:plus" width="20" />
                                         Ingredient
                                     </Button>
                                 </div>
@@ -657,7 +660,7 @@ export default function CreateRecipePage({
                                         });
                                     }}
                                 >
-                                    <Icon icon="mdi:plus" width="20"/>
+                                    <Icon icon="mdi:plus" width="20" />
                                     Step
                                 </Button>
                             </div>

@@ -20,13 +20,20 @@ const MyRecipes = ({ auth, recipes }) => {
 
             {initialLoading
                 ? Array.from({ length: 20 }, (v, i) => (
-                      <Skeleton className="w-[250px] h-[300px]" key={i}/>
+                      <Skeleton className="w-[250px] h-[300px]" key={i} />
                   ))
                 : null}
 
             {recipes.data && recipes.data.length > 0 && !initialLoading
                 ? recipes.data.map((recipe: any) => (
-                      <RecipeCard data={recipe} showPub hideSave showEdit key={recipe.id}/>
+                      <RecipeCard
+                          data={recipe}
+                          showPub
+                          hideSave
+                          showEdit
+                          key={recipe.id}
+                          showDelete
+                      />
                   ))
                 : null}
         </AccountRecipeLayout>

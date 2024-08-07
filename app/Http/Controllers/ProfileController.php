@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -59,5 +61,46 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function uploadProfilePicture(Request $r)
+    {
+        $rules = ['photo' => 'image|max:500'];
+
+        $validator = Validator::make($r->all(), $rules);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            return back()->withErrors($validator);
+        }
+
+        $user = \App\Models\User::find(auth()->user()->id);
+
+        $file = $r->file("photo");
+        $filename = $file->hashName();
+        $file->storePubliclyAs(
+            sprintf("profilepictures"),
+            $filename,
+            "public"
+        );
+
+        if (!is_null($user->photo)) {
+            Storage::delete("public/profilepictures/" . $user->photo);
+        }
+
+        $user->photo = $filename;
+        $user->save();
+
+        return back();
+    }
+
+    public function deleteProfilePicture(Request $r)
+    {
+        $user = \App\Models\User::find(auth()->user()->id);
+
+        Storage::delete("public/profilepictures/" . $user->photo);
+
+        $user->photo = null;
+        $user->save();
     }
 }

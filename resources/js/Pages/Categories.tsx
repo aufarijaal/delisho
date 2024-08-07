@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import { Pagination, Button, Dropdown, Skeleton } from "react-daisyui";
 import JsonViewer from "@andypf/json-viewer/dist/esm/react/JsonViewer";
 
-const CategoriesPage = ({ auth, recipes, category }: any) => {
+const CategoriesPage = ({ auth, recipes, category, sortBy }: any) => {
     const [initialLoading, setInitialLoading] = useState(false);
 
     return (
@@ -26,6 +26,11 @@ const CategoriesPage = ({ auth, recipes, category }: any) => {
                         </Dropdown.Toggle>
                         <Dropdown.Menu className="w-52 z-[5] translate-y-2">
                             <Dropdown.Item
+                                className={`${
+                                    sortBy === "newest" || !sortBy
+                                        ? "active"
+                                        : ""
+                                }`}
                                 onClick={() => {
                                     router.get(`/categories/${category.slug}`, {
                                         sortBy: "newest",
@@ -34,7 +39,30 @@ const CategoriesPage = ({ auth, recipes, category }: any) => {
                             >
                                 Newest
                             </Dropdown.Item>
-                            <Dropdown.Item>Oldest</Dropdown.Item>
+                            <Dropdown.Item
+                                className={`${
+                                    sortBy === "oldest" ? "active" : ""
+                                }`}
+                                onClick={() => {
+                                    router.get(`/categories/${category.slug}`, {
+                                        sortBy: "oldest",
+                                    });
+                                }}
+                            >
+                                Oldest
+                            </Dropdown.Item>
+                            {/* <Dropdown.Item
+                                className={`${
+                                    sortBy === "mostsaved" ? "active" : ""
+                                }`}
+                                onClick={() => {
+                                    router.get(`/categories/${category.slug}`, {
+                                        sortBy: "mostsaved",
+                                    });
+                                }}
+                            >
+                                Most saved
+                            </Dropdown.Item> */}
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>

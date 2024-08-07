@@ -3,7 +3,7 @@ export function resolveFinalImageUrl(filename: string) {
 }
 
 export function resolveProfilePictureUrl(filename: string) {
-    return `${location.origin}/storage/profilepicture/${filename}`;
+    return `${location.origin}/storage/profilepictures/${filename}`;
 }
 
 export function resolveStepImageUrl(filename: string) {

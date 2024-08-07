@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import DefaultLayout from "@/Layouts/DefaultLayout";
-import {Head, Link, router, usePage} from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import { Button, Dropdown, Pagination, Skeleton, Tabs } from "react-daisyui";
 import RecipeCard from "@/Components/RecipeCard";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
@@ -39,12 +39,46 @@ const AccountRecipeLayout = ({ auth, tab, children, recipes }) => {
                             <Icon icon="mdi:chevron-down" width="20" />
                         </Dropdown.Toggle>
                         <Dropdown.Menu className="w-52 z-[5] translate-y-2">
-                            <Dropdown.Item>Name</Dropdown.Item>
-                            <Dropdown.Item>Name descending</Dropdown.Item>
-                            <Dropdown.Item>Most saved</Dropdown.Item>
-                            <Dropdown.Item>Least saved</Dropdown.Item>
-                            <Dropdown.Item>Newest</Dropdown.Item>
-                            <Dropdown.Item>Oldest</Dropdown.Item>
+                            <Dropdown.Item
+                                onClick={() => {
+                                    router.get(`/account/recipes`, {
+                                        tab,
+                                        sortBy: "name",
+                                    });
+                                }}
+                            >
+                                Name
+                            </Dropdown.Item>
+                            <Dropdown.Item
+                                onClick={() => {
+                                    router.get(`/account/recipes`, {
+                                        tab,
+                                        sortBy: "namedesc",
+                                    });
+                                }}
+                            >
+                                Name descending
+                            </Dropdown.Item>
+                            <Dropdown.Item
+                                onClick={() => {
+                                    router.get(`/account/recipes`, {
+                                        tab,
+                                        sortBy: "newest",
+                                    });
+                                }}
+                            >
+                                Newest
+                            </Dropdown.Item>
+                            <Dropdown.Item
+                                onClick={() => {
+                                    router.get(`/account/recipes`, {
+                                        tab,
+                                        sortBy: "oldest",
+                                    });
+                                }}
+                            >
+                                Oldest
+                            </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>
@@ -58,10 +92,14 @@ const AccountRecipeLayout = ({ auth, tab, children, recipes }) => {
                         {recipes.links.map((item, i) => (
                             <Link
                                 href={item.url + "&tab=" + tab}
-                                className={`join-item btn btn-sm ${item.active ? 'btn-active' : ''} ${item.url ? '' : 'btn-disabled'}`}
+                                className={`join-item btn btn-sm ${
+                                    item.active ? "btn-active" : ""
+                                } ${item.url ? "" : "btn-disabled"}`}
                                 key={i}
                             >
-                                {item.label.replace("&laquo;", "").replace("&raquo;", "")}
+                                {item.label
+                                    .replace("&laquo;", "")
+                                    .replace("&raquo;", "")}
                             </Link>
                         ))}
                     </Pagination>

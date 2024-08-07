@@ -18,4 +18,9 @@ class Category extends Model
     {
         return $this->hasMany(Recipe::class);
     }
+
+    public function requestor()
+    {
+        return $this->belongsTo(User::class, 'requested_by_id', 'id');
+    }
 }

@@ -19,11 +19,32 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     $categories = \App\Models\Category::orderBy('name')->get();
+    $userId = auth()->user()?->id;
+    $saves = $userId ? \App\Models\SavedRecipe::select('recipe_id')
+        ->where('user_id', $userId)
+        ->pluck('recipe_id')
+        ->toArray() : [];
+
+    $greatestRecipes = \App\Models\Recipe::select(['id', 'user_id', 'final_image', 'title', 'slug', 'created_at', 'category_id', 'published'])
+        ->with([
+            'author:id,name,photo',
+            'category:id,name,slug'
+        ])
+        ->where('published', true)
+        ->withCount('savedByUsers as saves_count')
+        ->orderBy('saves_count', 'desc')
+        ->limit(5)
+        ->get()
+        ->map(function ($item) use ($userId, $saves) {
+            $item->saved = $userId ? in_array($item->id, $saves) : false;
+            return $item;
+        });
 
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
-        'categories' => $categories
+        'categories' => $categories,
+        'greatestRecipes' => $greatestRecipes
     ]);
 })->name('home');
 
@@ -72,6 +93,17 @@ Route::prefix('categories')->group(function () {
         ->name('categories.index');
 });
 
+Route::prefix('category-requests')->group(function () {
+    Route::get('/', [\App\Http\Controllers\CategoryController::class, 'getCategoryRequests'])
+        ->name('category_requests.index');
+    Route::get('/make', [\App\Http\Controllers\CategoryController::class, 'requestForm'])
+        ->middleware(['auth', 'verfied'])
+        ->name('category_requests.make');
+    Route::post('/make', [\App\Http\Controllers\CategoryController::class, 'store'])
+        ->middleware(['auth', 'verfied'])
+        ->name('category_requests.store');
+});
+
 Route::get('/search', [\App\Http\Controllers\SearchController::class, 'search']);
 
 Route::prefix('comments')->group(function () {
@@ -99,11 +131,19 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::patch('/profile-picture', [ProfileController::class, 'uploadProfilePicture'])->name('profile_picture.update');
+    Route::delete('/profile-picture', [ProfileController::class, 'deleteProfilePicture'])->name('profile_picture.destroy');
+
     Route::middleware('admin')->prefix('admin')->group(function () {
         Route::get('dashboard', function (Request $r) {
             return Inertia::render('Admin/Dashboard');
         })->name('admin.dashboard');
     });
+});
+
+Route::middleware(['auth', 'verified'])->prefix('give-feedback')->group(function () {
+    Route::get('/', [\App\Http\Controllers\FeedbackController::class, 'index'])->name('feedback.index');
+    Route::post('/', [\App\Http\Controllers\FeedbackController::class, 'store'])->name('feedback.store');
 });
 
 require __DIR__ . '/auth.php';
